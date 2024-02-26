@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define ALPHABET_SIZE 26
+void generateCipherSequence(char keyword[], char cipherSequence[]) {
+    int i, j;
+    int keywordLength = strlen(keyword);
+    int index = 0;
+    char alphabet[ALPHABET_SIZE] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    strcpy(cipherSequence, keyword);
+    index += keywordLength;
+
+    for (i = 0; i < keywordLength; i++) {
+        for (j = i + 1; j < keywordLength; j++) {
+            if (toupper(keyword[i]) == toupper(keyword[j])) {
+                keyword[j] = ' ';
+            }
+        }
+    }
+    for (i = 0; i < ALPHABET_SIZE; i++) {
+        if (strchr(keyword, toupper(alphabet[i])) == NULL) {
+            cipherSequence[index++] = alphabet[i];
+        }
+    }
+    cipherSequence[index] = '\0'; 
+}
+
+void encrypt(char plaintext[], char cipherSequence[]) {
+    int i;
+
+    for (i = 0; plaintext[i] != '\0'; i++) {
+        if (isalpha(plaintext[i]) && isupper(plaintext[i])) {
+            plaintext[i] = cipherSequence[plaintext[i] - 'A'];
+        }
+    }
+}
+void decrypt(char ciphertext[], char cipherSequence[]) {
+    int i;
+
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i]) && isupper(ciphertext[i])) {
+            ciphertext[i] = 'A' + (strchr(cipherSequence, ciphertext[i]) - cipherSequence);
+        }
+    }
+}
+
+int main() {
+    char keyword[] = "CIPHER";
+    char plaintext[] = "HELLO WORLD";
+    char ciphertext[100];
+    char cipherSequence[ALPHABET_SIZE + 1];
+
+    printf("Plaintext: %s\n", plaintext);
+    printf("Using Keyword: %s\n", keyword);
+
+    generateCipherSequence(keyword, cipherSequence);
+    printf("Generated Cipher Sequence: %s\n", cipherSequence);
+
+    encrypt(plaintext, cipherSequence);
+    printf("Encrypted Text: %s\n", plaintext);
+
+    strcpy(ciphertext, plaintext); 
+    decrypt(ciphertext, cipherSequence);
+    printf("Decrypted Text: %s\n", ciphertext);
+
+    return 0;
+}
