@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define SIZE 5
+
+char table[SIZE][SIZE];
+
+void generateTable(const char *key) {
+    int i, j, k;
+    int len = strlen(key);
+    char *alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"; 
+    memset(table, 0, sizeof(table));
+    for (i = 0, k = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            if (k < len) {
+                table[i][j] = toupper(key[k]);
+                k++;
+            } else {
+                break;
+            }
+        }
+    }
+
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            if (table[i][j] == 0) {
+                for (k = 0; k < 25; k++) {
+                    int found = 0;
+                    for (int x = 0; x < SIZE; x++) {
+                        for (int y = 0; y < SIZE; y++) {
+                            if (table[x][y] == alphabet[k]) {
+                                found = 1;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (!found) {
+                        table[i][j] = alphabet[k];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void findPosition(char ch, int *row, int *col) {
+    int i, j;
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            if (table[i][j] == ch) {
+                *row = i;
+                *col = j;
+                return;
+            }
+        }
+    }
+}
+
+void encrypt(char a, char b) {
+    int row1, col1, row2, col2;
+    findPosition(a, &row1, &col1);
+    findPosition(b, &row2, &col2);
+
+    if (row1 == row2) {
+        printf("%c%c", table[row1][(col1 + 1) % SIZE], table[row2][(col2 + 1) % SIZE]);
+    } else if (col1 == col2) {
+        printf("%c%c", table[(row1 + 1) % SIZE][col1], table[(row2 + 1) % SIZE][col2]);
+    } else {
+        printf("%c%c", table[row1][col2], table[row2][col1]);
+    }
+}
+
+int main() {
+    char key[100], plaintext[100];
+    printf("Enter the key: ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = '\0';
+
+    generateTable(key);
+
+    printf("Enter the plaintext (in uppercase): ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+    int index = 0;
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        if (plaintext[i] != ' ') {
+            plaintext[index++] = plaintext[i];
+        }
+    }
+    plaintext[index] = '\0';
+    if (strlen(plaintext) % 2 != 0) {
+        strcat(plaintext, "X");
+    }
+
+    printf("Encrypted text: ");
+    for (int i = 0; i < strlen(plaintext); i += 2) {
+        encrypt(plaintext[i], plaintext[i + 1]);
+    }
+    printf("\n");
+
+    return 0;
+}
