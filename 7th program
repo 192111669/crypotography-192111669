@@ -1,0 +1,20 @@
+#include <stdio.h>
+#include <string.h>
+void decrypt(char ciphertext[], char key[]) {
+    int i;
+    int len = strlen(ciphertext);
+    for (i = 0; i < len; i++) {
+        if (ciphertext[i] >= 'A' && ciphertext[i] <= 'Z') {
+            ciphertext[i] = key[ciphertext[i] - 'A'];
+        }
+    }
+}
+int main() {
+    char ciphertext[] = "JVTIVKVUGVVKPIKPIUCIGITQEGU";
+    char key[] = "QWERTYUIOPASDFGHJKLZXCVBNM"; 
+    printf("Ciphertext: %s\n", ciphertext);
+    printf("Using Key: %s\n", key);
+    decrypt(ciphertext, key);
+    printf("Decrypted Text: %s\n", ciphertext);
+    return 0;
+}
