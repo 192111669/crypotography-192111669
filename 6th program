@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int inverse(int a) {
+    a %= 26;
+    for (int i = 1; i < 26; i++) {
+        if ((a * i) % 26 == 1) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void decrypt(char *ciphertext, int a, int b) {
+    int a_inv = inverse(a);
+    if (a_inv == -1) {
+        printf("Invalid 'a' value, cannot find multiplicative inverse.\n");
+        return;
+    }
+    
+    int len = strlen(ciphertext);
+    for (int i = 0; i < len; i++) {
+        if (isalpha(ciphertext[i])) {
+            char base = isupper(ciphertext[i]) ? 'A' : 'a';
+            int index = (a_inv * (ciphertext[i] - 'A' - b)) % 26;
+            if (index < 0) index += 26; // Handle negative values
+            ciphertext[i] = (char)(index + base);
+        }
+    }
+}
+
+int main() {
+    char ciphertext[] = "BUBUBU"; // Example ciphertext
+    int most_frequent = 'B' - 'A';
+    int second_most_frequent = 'U' - 'A';
+
+    // Iterate over all possible values of b
+    for (int b = 0; b < 26; b++) {
+        int a = (second_most_frequent - most_frequent) % 26;
+        if (a < 0) a += 26; // Handle negative values
+        int a_inv = inverse(a);
+        if (a_inv == -1) continue; // Skip invalid 'a' values
+
+        decrypt(ciphertext, a, b);
+        printf("a = %d, b = %d: %s\n", a, b, ciphertext);
+    }
+
+    return 0;
+}
